@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 10px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .lote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .lote-table th {
+            background-color: #3498db;
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+        .lote-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .lote-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-complete {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .status-incomplete {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .api-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ titulo }}</h1>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value">{{ total_lotes }}</div>
+                <div class="stat-label">Lotes Registrados</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ total_lotes }}</div>
+                <div class="stat-label">En Proceso</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ total_lotes }}</div>
+                <div class="stat-label">Entregados</div>
+            </div>
+        </div>
+        
+        <h2>Últimos Lotes Registrados</h2>
+        <table class="lote-table">
+            <thead>
+                <tr>
+                    <th>Código Lote</th>
+                    <th>Finca</th>
+                    <th>Fecha Cosecha</th>
+                    <th>Responsable</th>
+                    <th>Estado Trazabilidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lote in lotes %}
+                <tr>
+                    <td>{{ lote.codigo_lote }}</td>
+                    <td>{{ lote.finca }}</td>
+                    <td>{{ lote.fecha_cosecha|date:"d/m/Y" }}</td>
+                    <td>{{ lote.responsable }}</td>
+                    <td>
+                        <span class="status-complete">●</span> Completa
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No hay lotes registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="api-info">
+            <h3>API Endpoints Disponibles</h3>
+            <p><strong>GET</strong> /api/lotes/ - Listar todos los lotes</p>
+            <p><strong>GET</strong> /api/lotes/{id}/ - Obtener trazabilidad de un lote</p>
+            <p><strong>POST</strong> /api/lotes/ - Crear nuevo lote</p>
+            <p><strong>POST</strong> /api/procesos/ - Registrar proceso de transformación</p>
+            <p><strong>POST</strong> /api/transportes/ - Registrar transporte</p>
+            <p><strong>POST</strong> /api/entregas/{id}/ - Registrar entrega</p>
+        </div>
+    </div>
+    
+    <script>
+        // Ejemplo de interacción con la API
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard de Trazabilidad cargado');
+            
+            // Ejemplo: Obtener trazabilidad de un lote
+            async function obtenerTrazabilidad(loteId) {
+                try {
+                    const response = await fetch(`/api/lotes/${loteId}/`);
+                    const data = await response.json();
+                    console.log('Trazabilidad obtenida:', data);
+                } catch (error) {
+                    console.error('Error al obtener trazabilidad:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
