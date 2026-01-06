@@ -58,5 +58,5 @@ Abre `http://127.0.0.1:8000/` en tu navegador.
 
 ## 📝 Licencia
 
-Por defecto se sugiere **MIT**. Si prefieres otra licencia, dímelo y la cambio.
+ **MIT**
 
