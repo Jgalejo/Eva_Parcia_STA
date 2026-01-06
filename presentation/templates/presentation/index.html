@@ -1,159 +1,401 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ titulo }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border-radius: 5px;
-        }
-        .stat-box {
-            text-align: center;
-            padding: 10px;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2980b9;
-        }
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-        .lote-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .lote-table th {
-            background-color: #3498db;
-            color: white;
-            text-align: left;
-            padding: 12px;
-        }
-        .lote-table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .lote-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        .status-complete {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        .status-incomplete {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .api-info {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>{{ titulo }}</h1>
-        
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-value">{{ total_lotes }}</div>
-                <div class="stat-label">Lotes Registrados</div>
+{% extends 'presentation/base.html' %}
+
+{% block title %}Dashboard | Trazabilidad EVA{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2 class="fw-bold text-dark mb-3">Panel de Control</h2>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card bg-white h-100 border-start border-4 border-success">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="display-5 text-success me-3"><i class="fas fa-seedling"></i></div>
+                        <div>
+                            <h6 class="text-muted text-uppercase mb-1">Lotes Registrados</h6>
+                            <h3 class="fw-bold mb-0">{{ total_lotes }}</h3>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-value">{{ total_lotes }}</div>
-                <div class="stat-label">En Proceso</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-value">{{ total_lotes }}</div>
-                <div class="stat-label">Entregados</div>
-            </div>
-        </div>
-        
-        <h2>Últimos Lotes Registrados</h2>
-        <table class="lote-table">
-            <thead>
-                <tr>
-                    <th>Código Lote</th>
-                    <th>Finca</th>
-                    <th>Fecha Cosecha</th>
-                    <th>Responsable</th>
-                    <th>Estado Trazabilidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lote in lotes %}
-                <tr>
-                    <td>{{ lote.codigo_lote }}</td>
-                    <td>{{ lote.finca }}</td>
-                    <td>{{ lote.fecha_cosecha|date:"d/m/Y" }}</td>
-                    <td>{{ lote.responsable }}</td>
-                    <td>
-                        <span class="status-complete">●</span> Completa
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" style="text-align: center;">No hay lotes registrados</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        <div class="api-info">
-            <h3>API Endpoints Disponibles</h3>
-            <p><strong>GET</strong> /api/lotes/ - Listar todos los lotes</p>
-            <p><strong>GET</strong> /api/lotes/{id}/ - Obtener trazabilidad de un lote</p>
-            <p><strong>POST</strong> /api/lotes/ - Crear nuevo lote</p>
-            <p><strong>POST</strong> /api/procesos/ - Registrar proceso de transformación</p>
-            <p><strong>POST</strong> /api/transportes/ - Registrar transporte</p>
-            <p><strong>POST</strong> /api/entregas/{id}/ - Registrar entrega</p>
-        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white p-3">
+        <ul class="nav nav-pills card-header-pills" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-dash-tab" data-bs-toggle="pill" data-bs-target="#pills-dash" type="button"><i class="fas fa-chart-pie me-2"></i>Dashboard</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-lote-tab" data-bs-toggle="pill" data-bs-target="#pills-lote" type="button"><i class="fas fa-plus-circle me-2"></i>1. Origen</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-process-tab" data-bs-toggle="pill" data-bs-target="#pills-process" type="button"><i class="fas fa-cogs me-2"></i>2. Transformación</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-logistic-tab" data-bs-toggle="pill" data-bs-target="#pills-logistic" type="button"><i class="fas fa-truck me-2"></i>3. Logística</button>
+            </li>
+        </ul>
     </div>
     
-    <script>
-        // Ejemplo de interacción con la API
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard de Trazabilidad cargado');
+    <div class="card-body p-4">
+        <div class="tab-content" id="pills-tabContent">
             
-            // Ejemplo: Obtener trazabilidad de un lote
-            async function obtenerTrazabilidad(loteId) {
-                try {
-                    const response = await fetch(`/api/lotes/${loteId}/`);
-                    const data = await response.json();
-                    console.log('Trazabilidad obtenida:', data);
-                } catch (error) {
-                    console.error('Error al obtener trazabilidad:', error);
-                }
+            <div class="tab-pane fade show active" id="pills-dash" role="tabpanel">
+                <h5 class="card-title mb-3">Últimos Lotes</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Finca</th>
+                                <th>Cosecha</th>
+                                <th>Responsable</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lote in lotes %}
+                            <tr>
+                                <td><span class="badge bg-secondary">{{ lote.codigo_lote }}</span></td>
+                                <td>{{ lote.finca }}</td>
+                                <td><i class="far fa-calendar-alt text-muted me-1"></i>{{ lote.fecha_cosecha|date:"d M, Y" }}</td>
+                                <td>{{ lote.responsable }}</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="verTrazabilidad('{{ lote.id }}')">
+                                        <i class="fas fa-search-location me-1"></i>Rastrear
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-4 text-muted">No hay lotes registrados aún.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="pills-lote" role="tabpanel">
+                <form id="form-lote" onsubmit="handleFormSubmit(event, '/api/lotes/', 'Lote de cultivo creado')">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Código Lote</label>
+                            <input type="text" name="codigo_lote" class="form-control" placeholder="Ej: LOTE-2026-001" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Finca</label>
+                            <input type="text" name="finca" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Variedad</label>
+                            <input type="text" name="variedad" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Hectáreas</label>
+                            <input type="number" step="0.01" name="hectareas" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Responsable</label>
+                            <input type="text" name="responsable" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Siembra</label>
+                            <input type="date" name="fecha_siembra" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Cosecha</label>
+                            <input type="date" name="fecha_cosecha" class="form-control" required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Guardar Origen</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="pills-process" role="tabpanel">
+                <form id="form-proceso" onsubmit="handleFormSubmit(event, '/api/procesos/', 'Proceso registrado')">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Seleccionar Lote (Origen)</label>
+                            <select name="lote_id" class="form-select" required>
+                                <option value="">-- Seleccione --</option>
+                                {% for lote in lotes %}
+                                <option value="{{ lote.id }}">{{ lote.codigo_lote }} - {{ lote.finca }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Lavado</label>
+                            <input type="datetime-local" name="fecha_lavado" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Responsable Lavado</label>
+                            <input type="text" name="responsable_lavado" class="form-control" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Método Lavado</label>
+                            <input type="text" name="metodo_lavado" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Empaquetado</label>
+                            <input type="datetime-local" name="fecha_empaquetado" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo Empaque</label>
+                            <input type="text" name="tipo_empaque" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" name="cantidad_empaquetada" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unidad Medida</label>
+                            <input type="text" name="unidad_medida" class="form-control" placeholder="kg, cajas..." required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-cogs me-2"></i>Registrar Proceso</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="pills-logistic" role="tabpanel">
+                <form id="form-transporte" onsubmit="handleFormSubmit(event, '/api/transportes/', 'Transporte despachado')">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Lote de Origen</label>
+                            <select name="lote_id" class="form-select" onchange="cargarProcesos(this.value)" required>
+                                <option value="">-- Seleccione Lote --</option>
+                                {% for lote in lotes %}
+                                <option value="{{ lote.id }}">{{ lote.codigo_lote }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Proceso Asociado</label>
+                            <select id="transporte_proceso_select" name="proceso_id" class="form-select" required disabled>
+                                <option value="">Esperando selección de lote...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Salida</label>
+                            <input type="datetime-local" name="fecha_salida" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destino</label>
+                            <input type="text" name="destino" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vehículo</label>
+                            <input type="text" name="vehiculo" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Conductor</label>
+                            <input type="text" name="conductor" class="form-control" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Temp. Promedio (°C)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.1" name="temperatura_promedio" class="form-control" placeholder="Rango óptimo: 10-15°C" required>
+                                <span class="input-group-text">°C</span>
+                            </div>
+                        </div>
+                        <input type="hidden" name="temperatura_minima" value="10">
+                        <input type="hidden" name="temperatura_maxima" value="15">
+                        
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-shipping-fast me-2"></i>Registrar Transporte</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="traceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-route me-2"></i>Cadena de Trazabilidad</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <div id="timelineContent" class="py-2">
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 1. Manejo de Formularios con SweetAlert2
+    async function handleFormSubmit(event, url, successTitle) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        if(data.certificacion_organica === "on") data.certificacion_organica = true;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok || result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: successTitle,
+                    text: result.message || 'Operación exitosa',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                form.reset();
+                if(url.includes('lotes')) setTimeout(() => location.reload(), 2000);
+            } else {
+                let errorDetails = result.message || '';
+                if (result.errors) errorDetails += '\n' + JSON.stringify(result.errors);
+                Swal.fire('Error', errorDetails, 'error');
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (error) {
+            Swal.fire('Error de Conexión', 'No se pudo contactar con el servidor', 'error');
+        }
+    }
+
+    // 2. Cargar Procesos (Select dinámico)
+    async function cargarProcesos(loteId) {
+        const selectProceso = document.getElementById('transporte_proceso_select');
+        selectProceso.innerHTML = '<option>Cargando...</option>';
+        selectProceso.disabled = true;
+
+        if (!loteId) return;
+
+        try {
+            const response = await fetch(`/api/lotes/${loteId}/`);
+            const result = await response.json();
+            
+            selectProceso.innerHTML = '<option value="">-- Seleccione Proceso --</option>';
+            
+            if (result.success && result.data.procesos && result.data.procesos.length > 0) {
+                result.data.procesos.forEach(p => {
+                    const fecha = new Date(p.fecha_empaquetado).toLocaleDateString();
+                    const option = document.createElement('option');
+                    option.value = p.id;
+                    option.text = `Empacado el ${fecha} (${p.tipo_empaque})`;
+                    selectProceso.appendChild(option);
+                });
+                selectProceso.disabled = false;
+            } else {
+                selectProceso.innerHTML = '<option>Sin procesos disponibles</option>';
+            }
+        } catch (error) {
+            selectProceso.innerHTML = '<option>Error al cargar</option>';
+        }
+    }
+
+    // 3. Visualizador de Trazabilidad (Timeline Dinámico)
+    async function verTrazabilidad(id) {
+        // Mostrar cargando
+        Swal.fire({ title: 'Cargando trazabilidad...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res = await fetch(`/api/lotes/${id}/`);
+            const json = await res.json();
+            Swal.close();
+
+            if(!json.success) {
+                Swal.fire('Información', 'No se encontraron datos completos de trazabilidad.', 'info');
+                return;
+            }
+
+            const data = json.data;
+            const container = document.getElementById('timelineContent');
+            let html = '<div class="timeline">';
+
+            // Paso 1: Origen
+            html += `
+                <div class="timeline-item">
+                    <div class="timeline-icon"><i class="fas fa-seedling"></i></div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">Origen: ${data.lote.finca}</h5>
+                            <p class="mb-1 text-muted small">Código: ${data.lote.codigo}</p>
+                            <p class="mb-1"><strong>Cosecha:</strong> ${data.lote.fecha_cosecha || 'Pendiente'}</p>
+                            <p class="mb-0"><strong>Responsable:</strong> ${data.lote.responsable}</p>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Paso 2: Procesos
+            if (data.procesos && data.procesos.length > 0) {
+                data.procesos.forEach(p => {
+                    html += `
+                    <div class="timeline-item">
+                        <div class="timeline-icon bg-warning text-white" style="border-color:#ffc107"><i class="fas fa-boxes"></i></div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">Transformación: ${p.tipo_empaque}</h5>
+                                <p class="mb-1"><strong>Lavado:</strong> ${p.fecha_lavado ? new Date(p.fecha_lavado).toLocaleString() : 'N/A'}</p>
+                                <p class="mb-1"><strong>Empaquetado:</strong> ${p.fecha_empaquetado ? new Date(p.fecha_empaquetado).toLocaleString() : 'N/A'}</p>
+                                ${p.controles_calidad.map(c => 
+                                    `<div class="mt-2 badge ${c.estado === 'Aprobado' ? 'bg-success' : 'bg-danger'}">Calidad: ${c.estado} (Inspector: ${c.inspector})</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html += `<div class="timeline-item"><div class="timeline-icon bg-secondary text-white"><i class="fas fa-ellipsis-h"></i></div><p class="text-muted ms-3">Sin transformación registrada.</p></div>`;
+            }
+
+            // Paso 3: Transportes
+            if (data.transportes && data.transportes.length > 0) {
+                data.transportes.forEach(t => {
+                    html += `
+                    <div class="timeline-item">
+                        <div class="timeline-icon bg-info text-white" style="border-color:#0dcaf0"><i class="fas fa-truck-moving"></i></div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-info">Logística: Destino ${t.destino}</h5>
+                                <p class="mb-1"><strong>Salida:</strong> ${t.fecha_salida ? new Date(t.fecha_salida).toLocaleString() : 'N/A'}</p>
+                                <p class="mb-1"><strong>Temp. Promedio:</strong> ${t.temperatura_promedio}°C</p>
+                                <span class="badge bg-primary">${t.estado_entrega}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            }
+
+            html += '</div>'; // Fin timeline
+
+            // Estado Final del Sistema
+            if (data.trazabilidad_completa) {
+                html += `<div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i>Trazabilidad Completa y Validada</div>`;
+            } else {
+                 html += `<div class="alert alert-warning mt-3"><i class="fas fa-exclamation-triangle me-2"></i>${data.mensaje_estado}</div>`;
+            }
+
+            container.innerHTML = html;
+            
+            // Abrir Modal Bootstrap
+            var myModal = new bootstrap.Modal(document.getElementById('traceModal'));
+            myModal.show();
+
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'Error al procesar los datos de trazabilidad', 'error');
+        }
+    }
+</script>
+{% endblock %}

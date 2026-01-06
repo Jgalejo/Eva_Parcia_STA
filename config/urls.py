@@ -9,10 +9,12 @@ from presentation.views import (
 )
 
 urlpatterns = [
+    
     path('admin/', admin.site.urls),
     path('', dashboard_view, name='dashboard'),
     
     # API Endpoints
+
     path('api/lotes/', LoteCultivoView.as_view(), name='lotes-list'),
     path('api/lotes/<int:lote_id>/', LoteCultivoView.as_view(), name='lotes-detail'),
     path('api/procesos/', ProcesoTransformacionView.as_view(), name='procesos-create'),
